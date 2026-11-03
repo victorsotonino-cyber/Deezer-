@@ -1,0 +1,21 @@
+{
+  "name": "datashop-discord-bot",
+  "version": "1.0.0",
+  "description": "Professional Discord store management bot built with discord.js v14",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "deploy": "node src/deploy-commands.js",
+    "check": "node --check src/index.js && node --check src/commands.js && node --check src/database.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.4.1",
+    "discord.js": "^14.22.1",
+    "dotenv": "^16.6.1"
+  }
+}
