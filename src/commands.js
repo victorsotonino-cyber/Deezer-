@@ -217,10 +217,10 @@ async function applyTemplate(i) {
   db.setSetting(i.guildId, 'template_type', type);
 
   return i.editReply({ embeds: [makeEmbed('✅ Plantilla aplicada: ' + storeName,
-    'La estructura está lista y no se eliminó ningún canal existente.\\n\\n' +
-    '**Diseño:** ' + type + '\\n**Roles nuevos:** ' + counts.roles +
-    '\\n**Categorías nuevas:** ' + counts.categories + '\\n**Canales nuevos:** ' + counts.channels +
-    '\\n\\nSiguiente paso: publica el panel con /ticket panel y añade productos con /producto agregar.')] });
+    'La estructura está lista y no se eliminó ningún canal existente.\n\n' +
+    '**Diseño:** ' + type + '\n**Roles nuevos:** ' + counts.roles +
+    '\n**Categorías nuevas:** ' + counts.categories + '\n**Canales nuevos:** ' + counts.channels +
+    '\n\nSiguiente paso: publica el panel con /ticket panel y añade productos con /producto agregar.')] });
 }
 
 async function handleRank(i) {
@@ -259,9 +259,9 @@ async function handleProduct(i) {
   const sub = i.options.getSubcommand();
   if (sub === 'listar') {
     const all = db.getProducts(i.guildId);
-    const text = all.map(p => '**#' + p.id + ' · ' + p.name + '**\\n' + (p.description || 'Sin descripción') +
-      '\\nPrecio: **' + p.price.toFixed(2) + ' ' + p.currency + '** · Stock: **' +
-      (p.stock < 0 ? 'Ilimitado' : p.stock) + '**').join('\\n\\n');
+    const text = all.map(p => '**#' + p.id + ' · ' + p.name + '**\n' + (p.description || 'Sin descripción') +
+      '\nPrecio: **' + p.price.toFixed(2) + ' ' + p.currency + '** · Stock: **' +
+      (p.stock < 0 ? 'Ilimitado' : p.stock) + '**').join('\n\n');
     return i.reply({ embeds: [makeEmbed('🛍️ Catálogo de productos', text || 'No hay productos activos.')] });
   }
   if (!isStaff(i)) return i.reply({ content: 'Solo staff puede modificar el catálogo.', ephemeral: true });
@@ -432,8 +432,8 @@ async function execute(i) {
     db.addVouch(i.guildId, i.user.id, target.id, stars, comment);
     const channel = i.guild.channels.cache.get(db.getSetting(i.guildId, 'vouch_channel_id'));
     if (channel) await channel.send({ embeds: [makeEmbed('⭐ Nueva valoración',
-      'Cliente: ' + i.user.toString() + '\\nValorado: ' + target.toString() +
-      '\\nPuntuación: ' + '⭐'.repeat(stars) + '\\n\\n' + comment)] });
+      'Cliente: ' + i.user.toString() + '\nValorado: ' + target.toString() +
+      '\nPuntuación: ' + '⭐'.repeat(stars) + '\n\n' + comment)] });
     return i.reply({ content: 'Valoración registrada correctamente.', ephemeral: true });
   }
 
@@ -441,17 +441,17 @@ async function execute(i) {
     if (!isStaff(i)) return i.reply({ content: 'Solo staff puede consultar las estadísticas.', ephemeral: true });
     const s = db.getStats(i.guildId);
     return i.reply({ embeds: [makeEmbed('📊 Estadísticas de la tienda',
-      'Productos activos: **' + s.products + '**\\nPedidos pendientes: **' + s.pending +
-      '**\\nPedidos completados: **' + s.completed + '**\\nVentas completadas: **' +
-      Number(s.revenue).toFixed(2) + '**\\nValoraciones: **' + s.vouches + '**')], ephemeral: true });
+      'Productos activos: **' + s.products + '**\nPedidos pendientes: **' + s.pending +
+      '**\nPedidos completados: **' + s.completed + '**\nVentas completadas: **' +
+      Number(s.revenue).toFixed(2) + '**\nValoraciones: **' + s.vouches + '**')], ephemeral: true });
   }
 
   if (i.commandName === 'userinfo') {
     const user = i.options.getUser('miembro') || i.user;
     const member = await i.guild.members.fetch(user.id).catch(() => null);
-    const description = 'Usuario: ' + user.toString() + '\\nID: ' + user.id +
-      '\\nCuenta creada: <t:' + Math.floor(user.createdTimestamp / 1000) + ':R>\\n' +
-      (member ? 'Entró al servidor: <t:' + Math.floor(member.joinedTimestamp / 1000) + ':R>\\nRoles: ' +
+    const description = 'Usuario: ' + user.toString() + '\nID: ' + user.id +
+      '\nCuenta creada: <t:' + Math.floor(user.createdTimestamp / 1000) + ':R>\n' +
+      (member ? 'Entró al servidor: <t:' + Math.floor(member.joinedTimestamp / 1000) + ':R>\nRoles: ' +
         (member.roles.cache.filter(role => role.id !== i.guild.id).map(role => role.toString()).join(', ') || 'Ninguno') : 'No está en este servidor.');
     return i.reply({ embeds: [makeEmbed('👤 Información del miembro', description).setThumbnail(user.displayAvatarURL({ size: 256 }))], ephemeral: true });
   }
@@ -469,7 +469,7 @@ async function execute(i) {
     const options = i.options.getString('opciones').split('|').map(value => value.trim()).filter(Boolean).slice(0, 4);
     if (options.length < 2) return i.reply({ content: 'Añade al menos dos opciones separadas por |.', ephemeral: true });
     const emojis = ['1️⃣', '2️⃣', '3️⃣', '4️⃣'];
-    const text = options.map((value, index) => emojis[index] + ' ' + value).join('\\n');
+    const text = options.map((value, index) => emojis[index] + ' ' + value).join('\n');
     const message = await i.channel.send({ embeds: [makeEmbed('📊 ' + i.options.getString('pregunta'), text)] });
     for (let index = 0; index < options.length; index++) await message.react(emojis[index]).catch(() => null);
     return i.reply({ content: 'Encuesta publicada.', ephemeral: true });
@@ -516,7 +516,7 @@ async function execute(i) {
       '**Moderación:** /moderacion ban, /moderacion kick, /moderacion timeout, /moderacion limpiar',
       '**Staff:** /anuncio, /say'
     ];
-    return i.reply({ embeds: [makeEmbed('🧭 Centro de comandos', sections.join('\\n'))], ephemeral: true });
+    return i.reply({ embeds: [makeEmbed('🧭 Centro de comandos', sections.join('\n'))], ephemeral: true });
   }
 }
 
