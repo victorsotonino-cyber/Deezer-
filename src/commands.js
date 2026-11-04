@@ -220,12 +220,12 @@ async function applyTemplate(i) {
       const result = await ensureText(i.guild, category.channel, channelName, topic);
       if (result.created) counts.channels++;
       const lower = channelName.toLowerCase();
-      if (lower.includes('wlc') || lower.includes('bienvenida')) db.setSetting(i.guildId, 'welcome_channel_id', result.channel.id);
+      if (lower.includes('wlc') || lower.includes('bienvenida') || lower.includes('welcome')) db.setSetting(i.guildId, 'welcome_channel_id', result.channel.id);
       if (lower.includes('tickets')) db.setSetting(i.guildId, 'ticket_panel_channel_id', result.channel.id);
-      if (lower.includes('vouches')) db.setSetting(i.guildId, 'vouch_channel_id', result.channel.id);
-      if (lower.includes('tienda') || lower.includes('catalogo')) db.setSetting(i.guildId, 'catalog_channel_id', result.channel.id);
+      if (lower.includes('vouches') || lower.includes('reviews')) db.setSetting(i.guildId, 'vouch_channel_id', result.channel.id);
+      if (lower.includes('tienda') || lower.includes('catalogo') || lower.includes('catalog')) db.setSetting(i.guildId, 'catalog_channel_id', result.channel.id);
     }
-    if (layout.name === '[TICKETS]') db.setSetting(i.guildId, 'ticket_category_id', category.channel.id);
+    if (layout.channels.some(([channelName]) => channelName.toLowerCase().includes('tickets'))) db.setSetting(i.guildId, 'ticket_category_id', category.channel.id);
   }
 
   db.setSetting(i.guildId, 'store_name', storeName);
