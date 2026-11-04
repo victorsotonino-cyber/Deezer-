@@ -19,7 +19,7 @@ db.exec([
   'CREATE INDEX IF NOT EXISTS idx_orders_guild ON orders(guild_id, status)',
   'CREATE INDEX IF NOT EXISTS idx_tickets_opener ON tickets(guild_id, opener_id, status)',
   'CREATE INDEX IF NOT EXISTS idx_vouches_guild ON vouches(guild_id)'
-].join('\n'));
+].join(';\n') + ';');
 
 const q = {
   setting: db.prepare('SELECT setting_value FROM settings WHERE guild_id = ? AND setting_key = ?'),
