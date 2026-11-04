@@ -4,13 +4,12 @@
   "description": "Professional Discord store management bot built with discord.js v14",
   "main": "src/index.js",
   "type": "commonjs",
-  "engines": {
-    "node": ">=22.0.0"
-  },
+  "engines": { "node": ">=22.0.0" },
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "check": "node --check src/index.js && node --check src/commands/plantilla.js && node --check src/commands/ping.js && node --check src/commands/help.js"
+    "deploy": "node src/deploy-commands.js",
+    "check": "node --check src/config.js && node --check src/database.js && node --check src/commands.js && node --check src/index.js && node --check src/deploy-commands.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.4.1",
