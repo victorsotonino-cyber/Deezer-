@@ -44,13 +44,21 @@ const commands = [
       .addIntegerOption(o => o.setName('id').setDescription('ID del pedido').setRequired(true).setMinValue(1))
       .addStringOption(o => o.setName('estado').setDescription('Nuevo estado').setRequired(true)
         .addChoices({ name: 'Pendiente', value: 'pendiente' }, { name: 'Pagado', value: 'pagado' }, { name: 'Completado', value: 'completado' }, { name: 'Cancelado', value: 'cancelado' })))
-    .addSubcommand(s => s.setName('listar').setDescription('Lista los últimos pedidos (staff)')),
+    .addSubcommand(s => s.setName('listar').setDescription('Lista los últimos pedidos (staff)'))
+    .addSubcommand(s => s.setName('miscompras').setDescription('Consulta tu historial de pedidos')),
   new SlashCommandBuilder().setName('ticket').setDescription('Centro de soporte y tickets privados.')
     .addSubcommand(s => s.setName('panel').setDescription('Publica el panel para abrir tickets'))
     .addSubcommand(s => s.setName('cerrar').setDescription('Cierra el ticket actual'))
     .addSubcommand(s => s.setName('reclamar').setDescription('Reclama el ticket actual (staff)'))
     .addSubcommand(s => s.setName('agregar').setDescription('Da acceso a un miembro')
       .addUserOption(o => o.setName('miembro').setDescription('Miembro').setRequired(true))),
+  new SlashCommandBuilder().setName('metodo').setDescription('Configura y consulta métodos de pago de la tienda.')
+    .addSubcommand(s => s.setName('agregar').setDescription('Añade un método de pago')
+      .addStringOption(o => o.setName('nombre').setDescription('Nombre del método').setRequired(true).setMaxLength(50))
+      .addStringOption(o => o.setName('instrucciones').setDescription('Instrucciones de pago').setRequired(true).setMaxLength(500)))
+    .addSubcommand(s => s.setName('listar').setDescription('Muestra los métodos de pago disponibles'))
+    .addSubcommand(s => s.setName('eliminar').setDescription('Desactiva un método de pago')
+      .addIntegerOption(o => o.setName('id').setDescription('ID del método').setRequired(true).setMinValue(1))),
   new SlashCommandBuilder().setName('vouch').setDescription('Registra una valoración de compra.')
     .addUserOption(o => o.setName('miembro').setDescription('Persona valorada').setRequired(true))
     .addIntegerOption(o => o.setName('estrellas').setDescription('Puntuación de 1 a 5').setRequired(true).setMinValue(1).setMaxValue(5))
@@ -293,6 +301,12 @@ async function handleOrder(i) {
       return i.reply({ content: error.message, ephemeral: true });
     }
   }
+  if (sub === 'miscompras') {
+    const orders = db.getUserOrders(i.guildId, i.user.id);
+    const description = orders.map(order => '**#' + order.id + '** · ' + order.product_name + ' ×' + order.quantity +
+      ' · ' + order.total.toFixed(2) + ' · **' + order.status + '**').join('\n');
+    return i.reply({ embeds: [makeEmbed('🧾 Mis compras', description || 'Todavía no tienes pedidos registrados.')], ephemeral: true });
+  }
   if (!isStaff(i)) return i.reply({ content: 'Solo staff puede consultar o actualizar pedidos.', ephemeral: true });
   if (sub === 'listar') {
     const all = db.getOrders(i.guildId);
@@ -306,6 +320,22 @@ async function handleOrder(i) {
   } catch (error) {
     return i.reply({ content: error.message, ephemeral: true });
   }
+}
+
+async function handlePaymentMethod(i) {
+  const sub = i.options.getSubcommand();
+  if (sub === 'listar') {
+    const methods = db.getPaymentMethods(i.guildId);
+    const description = methods.map(method => '**#' + method.id + ' · ' + method.name + '**\n' + method.details).join('\n\n');
+    return i.reply({ embeds: [makeEmbed('💳 Métodos de pago', description || 'La tienda todavía no ha configurado métodos de pago.')] });
+  }
+  if (!isStaff(i)) return i.reply({ content: 'Solo el staff puede gestionar métodos de pago.', ephemeral: true });
+  if (sub === 'agregar') {
+    const id = db.addPaymentMethod(i.guildId, i.options.getString('nombre'), i.options.getString('instrucciones'));
+    return i.reply({ content: 'Método añadido con ID **#' + id + '**.', ephemeral: true });
+  }
+  const result = db.removePaymentMethod(i.guildId, i.options.getInteger('id'));
+  return i.reply({ content: result.changes ? 'Método de pago desactivado.' : 'No se encontró ese método activo.', ephemeral: true });
 }
 
 async function closeTicket(i, channel) {
@@ -424,6 +454,7 @@ async function execute(i) {
   if (i.commandName === 'producto') return handleProduct(i);
   if (i.commandName === 'pedido') return handleOrder(i);
   if (i.commandName === 'ticket') return handleTicket(i);
+  if (i.commandName === 'metodo') return handlePaymentMethod(i);
   if (i.commandName === 'moderacion') return handleModeration(i);
 
   if (i.commandName === 'vouch') {
@@ -511,8 +542,8 @@ async function execute(i) {
     const sections = [
       '**Servidor:** /plantilla, /configuracion',
       '**Rangos:** /rango crear, /rango listar, /rango asignar, /rango quitar',
-      '**Tienda:** /producto agregar, /producto listar, /producto stock',
-      '**Pedidos:** /pedido crear, /pedido estado, /pedido listar, /stats',
+      '**Tienda:** /producto agregar, /producto listar, /producto stock, /metodo listar',
+      '**Pedidos:** /pedido crear, /pedido miscompras, /pedido estado, /pedido listar, /stats',
       '**Tickets:** /ticket panel, /ticket cerrar, /ticket reclamar, /ticket agregar',
       '**Comunidad:** /vouch, /sugerencia, /encuesta, /userinfo',
       '**Moderación:** /moderacion ban, /moderacion kick, /moderacion timeout, /moderacion limpiar',
