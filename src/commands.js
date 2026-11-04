@@ -197,6 +197,12 @@ async function applyTemplate(i) {
     { name: '[INICIO]', channels: [['👋・bienvenida', 'Bienvenida de la comunidad'], ['📜・reglas', 'Normas y términos'], ['📢・anuncios', 'Anuncios oficiales']] },
     { name: '[TIENDA]', channels: [['🛒・catalogo', 'Catálogo de productos'], ['💳・metodos', 'Métodos de pago'], ['💚・ventas', 'Registro de ventas']] },
     { name: '[COMUNIDAD]', channels: [['💬・chat', 'Conversación general'], ['🎟️・tickets', 'Panel de soporte']] }
+  ] : type === 'market' ? [
+    { name: '[START]', channels: [['👋・welcome', 'Bienvenida'], ['📜・terms', 'Términos y condiciones'], ['📣・news', 'Noticias del mercado']] },
+    { name: '[MARKET]', channels: [['🛍️・catalog', 'Catálogo de productos'], ['💳・payments', 'Métodos de pago'], ['📦・orders', 'Información de pedidos'], ['✅・sales', 'Ventas confirmadas']] },
+    { name: '[COMMUNITY]', channels: [['💬・chat', 'Chat de clientes'], ['🎁・giveaways', 'Sorteos'], ['⭐・reviews', 'Reseñas de clientes']] },
+    { name: '[SUPPORT]', channels: [['🎟️・tickets', 'Centro de soporte'], ['🛡️・legit-check', 'Verificaciones']] },
+    { name: '[TEAM]', private: true, channels: [['🔐・team-panel', 'Panel privado del equipo'], ['📋・staff-logs', 'Registro del equipo']] }
   ] : [
     { name: '[WLC]', channels: [['⚡・wlc', 'Bienvenida y novedades'], ['📚・terminos', 'Términos y condiciones'], ['💚・ventas', 'Registro público de ventas'], ['👥・miembros', 'Información de la comunidad']] },
     { name: '[OWNER]', private: true, channels: [['🔐・panel-owner', 'Panel privado de administración'], ['📋・logs', 'Registro administrativo']] },
