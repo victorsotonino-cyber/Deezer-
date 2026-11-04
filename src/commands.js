@@ -351,6 +351,7 @@ async function handleButton(i) {
     if (existing) {
       const openChannel = i.guild.channels.cache.get(existing.channel_id);
       if (openChannel) return i.editReply({ content: 'Ya tienes un ticket abierto: ' + openChannel.toString() });
+      db.closeTicket(i.guildId, existing.channel_id);
     }
     let categoryId = db.getSetting(i.guildId, 'ticket_category_id');
     let category = categoryId ? i.guild.channels.cache.get(categoryId) : null;
