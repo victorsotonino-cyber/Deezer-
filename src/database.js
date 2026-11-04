@@ -28,7 +28,7 @@ const q = {
   product: db.prepare('SELECT * FROM products WHERE guild_id = ? AND id = ? AND active = 1'),
   productAny: db.prepare('SELECT * FROM products WHERE guild_id = ? AND id = ?'),
   addProduct: db.prepare('INSERT INTO products (guild_id, name, description, price, currency, stock) VALUES (?, ?, ?, ?, ?, ?)'),
-  updateStock: db.prepare('UPDATE products SET stock = ? WHERE guild_id = ? AND id = ? AND active = 1'),
+  updateStock: db.prepare('UPDATE products SET stock = ? WHERE guild_id = ? AND id = ?'),
   removeProduct: db.prepare('UPDATE products SET active = 0 WHERE guild_id = ? AND id = ?'),
   addOrder: db.prepare('INSERT INTO orders (guild_id, user_id, product_id, quantity, total) VALUES (?, ?, ?, ?, ?)'),
   order: db.prepare('SELECT o.*, p.name AS product_name FROM orders o JOIN products p ON p.id = o.product_id WHERE o.guild_id = ? AND o.id = ?'),
