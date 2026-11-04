@@ -49,7 +49,9 @@ const commands = [
   new SlashCommandBuilder().setName('ticket').setDescription('Centro de soporte y tickets privados.')
     .addSubcommand(s => s.setName('panel').setDescription('Publica el panel para abrir tickets'))
     .addSubcommand(s => s.setName('cerrar').setDescription('Cierra el ticket actual'))
+    .addSubcommand(s => s.setName('reabrir').setDescription('Reabre un ticket cerrado'))
     .addSubcommand(s => s.setName('reclamar').setDescription('Reclama el ticket actual (staff)'))
+    .addSubcommand(s => s.setName('liberar').setDescription('Libera el ticket reclamado (staff)'))
     .addSubcommand(s => s.setName('agregar').setDescription('Da acceso a un miembro')
       .addUserOption(o => o.setName('miembro').setDescription('Miembro').setRequired(true))),
   new SlashCommandBuilder().setName('metodo').setDescription('Configura y consulta métodos de pago de la tienda.')
@@ -360,6 +362,22 @@ async function handleTicket(i) {
   }
   if (sub === 'cerrar') return closeTicket(i, i.channel);
   const ticket = db.getTicket(i.guildId, i.channelId);
+  if (sub === 'reabrir') {
+    if (!ticket || ticket.status !== 'closed') return i.reply({ content: 'Este canal no es un ticket cerrado.', ephemeral: true });
+    if (ticket.opener_id !== i.user.id && !isStaff(i)) return i.reply({ content: 'Solo el cliente o staff puede reabrir este ticket.', ephemeral: true });
+    const changed = db.reopenTicket(i.guildId, i.channelId);
+    if (!changed.changes) return i.reply({ content: 'No se pudo reabrir el ticket.', ephemeral: true });
+    const opener = await i.guild.members.fetch(ticket.opener_id).catch(() => null);
+    if (opener) await i.channel.permissionOverwrites.edit(opener, { ViewChannel: true, SendMessages: true, ReadMessageHistory: true });
+    await i.channel.setName(i.channel.name.replace(/^cerrado-/, '').slice(0, 90)).catch(() => null);
+    return i.reply({ content: 'Ticket reabierto correctamente.' });
+  }
+  if (sub === 'liberar') {
+    if (!isStaff(i)) return i.reply({ content: 'Solo staff puede liberar tickets.', ephemeral: true });
+    if (!ticket || ticket.status !== 'open') return i.reply({ content: 'Este no es un ticket abierto.', ephemeral: true });
+    db.unclaimTicket(i.guildId, i.channelId);
+    return i.reply({ content: 'El ticket quedó libre para otro miembro del staff.' });
+  }
   if (!ticket || ticket.status !== 'open') return i.reply({ content: 'Este canal no es un ticket abierto.', ephemeral: true });
   if (sub === 'reclamar') {
     if (!isStaff(i)) return i.reply({ content: 'Solo staff puede reclamar tickets.', ephemeral: true });
@@ -544,7 +562,7 @@ async function execute(i) {
       '**Rangos:** /rango crear, /rango listar, /rango asignar, /rango quitar',
       '**Tienda:** /producto agregar, /producto listar, /producto stock, /metodo listar',
       '**Pedidos:** /pedido crear, /pedido miscompras, /pedido estado, /pedido listar, /stats',
-      '**Tickets:** /ticket panel, /ticket cerrar, /ticket reclamar, /ticket agregar',
+      '**Tickets:** /ticket panel, /ticket cerrar, /ticket reabrir, /ticket reclamar, /ticket liberar, /ticket agregar',
       '**Comunidad:** /vouch, /sugerencia, /encuesta, /userinfo',
       '**Moderación:** /moderacion ban, /moderacion kick, /moderacion timeout, /moderacion limpiar',
       '**Staff:** /anuncio, /say'
