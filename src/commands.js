@@ -397,7 +397,8 @@ async function handleModeration(i) {
   const reason = i.options.getString('motivo') || 'Sin motivo especificado';
   if (!member) return i.reply({ content: 'El miembro no está en el servidor.', ephemeral: true });
   if (member.id === i.user.id || member.id === i.client.user.id) return i.reply({ content: 'No puedes aplicar esa acción a ese usuario.', ephemeral: true });
-  if (member.roles.highest.position >= i.member.roles.highest.position && i.guild.ownerId !== i.user.id) {
+  const moderator = await i.guild.members.fetch(i.user.id);
+  if (member.roles.highest.position >= moderator.roles.highest.position && i.guild.ownerId !== i.user.id) {
     return i.reply({ content: 'No puedes moderar a alguien con un rol igual o superior al tuyo.', ephemeral: true });
   }
   if (sub === 'ban') {
