@@ -13,7 +13,8 @@ Bot modular para tiendas y comunidades. Utiliza Node.js 22, discord.js v14 y SQL
 
 ### Tienda y pedidos
 - /producto agregar, listar, stock y eliminar.
-- /pedido crear, estado y listar.
+- /pedido crear, estado, listar y miscompras para que cada cliente consulte su historial.
+- /metodo agregar, listar y eliminar para gestionar instrucciones de pago.
 - Estados de pedido: pendiente, pagado, completado y cancelado.
 - Inventario: se descuenta cuando el staff completa el pedido y se restaura si un pedido completado se revierte.
 - /stats muestra productos, pedidos y volumen completado.
