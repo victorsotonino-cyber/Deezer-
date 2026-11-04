@@ -20,7 +20,7 @@ Bot modular para tiendas y comunidades. Utiliza Node.js 22, discord.js v14 y SQL
 - /stats muestra productos, pedidos y volumen completado.
 
 ### Tickets y comunidad
-- /ticket panel, cerrar, reclamar y agregar.
+- /ticket panel, cerrar, reabrir, reclamar, liberar y agregar.
 - Apertura mediante botón y canales privados.
 - Un ticket abierto por miembro; los cierres conservan el historial.
 - /vouch registra valoraciones, /sugerencia publica ideas y /encuesta crea votaciones por reacciones.
